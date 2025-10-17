@@ -31,12 +31,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
     <body onload="app.init()">
-    <h1>Collaborative Paint Application</h1>
+    <div class="container">
+        <h1>Collaborative Paint Application</h1>
+        
+        <div class="controls">
+            <div class="input-group">
+                <label for="drawingId">Drawing ID:</label>
+                <input type="number" id="drawingId" min="1" value="1" class="form-control">
+                <button id="connectBtn" class="btn btn-primary">Connect</button>
+                <span id="connectionStatus" class="status">Disconnected</span>
+            </div>
+        </div>
 
-    <canvas id="canvas" width="800" height="600"></canvas>
+        <canvas id="canvas" width="800" height="500"></canvas>
 
-    <div class="info">
-        <strong>Instructions:</strong> Click on the canvas to draw points. All connected clients will see your drawings in real-time.
+        <div class="info">
+            <strong>Instructions:</strong> 
+            <ol>
+                <li>Enter a drawing ID (number)</li>
+                <li>Click 'Connect' to join the drawing session</li>
+                <li>Click on the canvas to draw points</li>
+                <li>Share the drawing ID with others to collaborate in real-time</li>
+            </ol>
+        </div>
     </div>
     </body>
 </html>

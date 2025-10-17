@@ -7,28 +7,31 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
-import org.springframework.web.socket.config.annotation.EnableWebSocket;
 
 @Configuration
-@EnableWebSocket
 @EnableWebSocketMessageBroker
 public class CollabPaintWebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(@NonNull MessageBrokerRegistry config) {
-        // Habilita un broker simple en memoria
+        // Enable a simple in-memory broker for topics
         config.enableSimpleBroker("/topic");
-        // Prefijo para los mensajes que se envían desde el cliente al servidor
+        
+        // Set prefix for application destination (client to server)
         config.setApplicationDestinationPrefixes("/app");
-        // Prefijo para los mensajes de usuario
+        
+        // Set prefix for user destination (private messages)
         config.setUserDestinationPrefix("/user");
+        
+        // Set the message size limits (optional)
+        config.setUserRegistryOrder(0);
     }
 
     @Override
     public void registerStompEndpoints(@NonNull StompEndpointRegistry registry) {
         // Configure WebSocket endpoint with SockJS fallback
         registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("*")
+                .setAllowedOriginPatterns("*") // Allow all origins for development
                 .withSockJS()
                 .setClientLibraryUrl("https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js")
                 .setSessionCookieNeeded(false)
@@ -39,9 +42,9 @@ public class CollabPaintWebSocketConfig implements WebSocketMessageBrokerConfigu
 
     @Override
     public void configureWebSocketTransport(@NonNull WebSocketTransportRegistration registration) {
-        // Configuración adicional del transporte WebSocket
-        registration.setMessageSizeLimit(1024 * 1024);
-        registration.setSendBufferSizeLimit(1024 * 1024);
-        registration.setSendTimeLimit(20000);
+        // Configure WebSocket transport settings
+        registration.setMessageSizeLimit(1024 * 1024); // 1MB
+        registration.setSendBufferSizeLimit(1024 * 1024); // 1MB
+        registration.setSendTimeLimit(20000); // 20 seconds
     }
 }

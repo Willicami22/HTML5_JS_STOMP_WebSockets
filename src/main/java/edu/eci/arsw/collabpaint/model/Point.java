@@ -23,16 +23,28 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @author hcadavid
  */
+import java.util.Objects;
+
 public class Point {
-    int x,y;
+    private int x;
+    private int y;
+    private String drawingId;
+    private String timestamp;
 
     public Point() {
+        // Default constructor for JSON deserialization
     }
 
     @JsonCreator
-    public Point(@JsonProperty("x") int x, @JsonProperty("y") int y) {
+    public Point(
+            @JsonProperty("x") int x, 
+            @JsonProperty("y") int y,
+            @JsonProperty("drawingId") String drawingId,
+            @JsonProperty("timestamp") String timestamp) {
         this.x = x;
         this.y = y;
+        this.drawingId = drawingId;
+        this.timestamp = timestamp;
     }
 
     public int getX() {
@@ -51,21 +63,46 @@ public class Point {
         this.y = y;
     }
 
-    @Override
-    public String toString(){
-        return "{\"x\":" + x + ",\"y\":" + y + "}";
+    @JsonProperty("drawingId")
+    public String getDrawingId() {
+        return drawingId;
     }
-    
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Point point = (Point) obj;
-        return x == point.x && y == point.y;
+
+    public void setDrawingId(String drawingId) {
+        this.drawingId = drawingId;
     }
-    
+
+    @JsonProperty("timestamp")
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Point point = (Point) o;
+        return x == point.x && 
+               y == point.y && 
+               Objects.equals(drawingId, point.drawingId) &&
+               Objects.equals(timestamp, point.timestamp);
+    }
+
     @Override
     public int hashCode() {
-        return 31 * x + y;
+        return Objects.hash(x, y, drawingId, timestamp);
+    }
+
+    @Override
+    public String toString() {
+        return "{\"x\":" + x + "," +
+               "\"y\":" + y + "," +
+               "\"drawingId\":" + (drawingId != null ? "\"" + drawingId + "\"" : "null") + "," +
+               "\"timestamp\":" + (timestamp != null ? "\"" + timestamp + "\"" : "null") + 
+               "}";
     }
 }
