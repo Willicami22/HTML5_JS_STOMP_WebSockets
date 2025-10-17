@@ -1,48 +1,47 @@
-/*
- * Copyright (C) 2016 Pivotal Software, Inc.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package edu.eci.arsw.collabpaint;
 
-/**
- *
- * @author hcadavid
- */
-import java.util.logging.Logger;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.NonNull;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.util.AntPathMatcher;
-import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
 
 @Configuration
+@EnableWebSocket
 @EnableWebSocketMessageBroker
-public class CollabPaintWebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
+public class CollabPaintWebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
-    public void configureMessageBroker(MessageBrokerRegistry config) {
+    public void configureMessageBroker(@NonNull MessageBrokerRegistry config) {
+        // Habilita un broker simple en memoria
         config.enableSimpleBroker("/topic");
-        config.setApplicationDestinationPrefixes("/app");        
+        // Prefijo para los mensajes que se envían desde el cliente al servidor
+        config.setApplicationDestinationPrefixes("/app");
+        // Prefijo para los mensajes de usuario
+        config.setUserDestinationPrefix("/user");
     }
 
     @Override
-    public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/stompendpoint").withSockJS();
-        
+    public void registerStompEndpoints(@NonNull StompEndpointRegistry registry) {
+        // Configure WebSocket endpoint with SockJS fallback
+        registry.addEndpoint("/ws")
+                .setAllowedOriginPatterns("*")
+                .withSockJS()
+                .setClientLibraryUrl("https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js")
+                .setSessionCookieNeeded(false)
+                .setStreamBytesLimit(512 * 1024) // 512KB
+                .setHttpMessageCacheSize(1000)
+                .setDisconnectDelay(30 * 1000); // 30 seconds
     }
-    
 
+    @Override
+    public void configureWebSocketTransport(@NonNull WebSocketTransportRegistration registration) {
+        // Configuración adicional del transporte WebSocket
+        registration.setMessageSizeLimit(1024 * 1024);
+        registration.setSendBufferSizeLimit(1024 * 1024);
+        registration.setSendTimeLimit(20000);
+    }
 }

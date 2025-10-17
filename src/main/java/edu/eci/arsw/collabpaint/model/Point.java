@@ -16,6 +16,9 @@
  */
 package edu.eci.arsw.collabpaint.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  *
  * @author hcadavid
@@ -26,7 +29,8 @@ public class Point {
     public Point() {
     }
 
-    public Point(int x, int y) {
+    @JsonCreator
+    public Point(@JsonProperty("x") int x, @JsonProperty("y") int y) {
         this.x = x;
         this.y = y;
     }
@@ -48,11 +52,20 @@ public class Point {
     }
 
     @Override
-    public String toString() {
-        return "Point{" + "x=" + x + ", y=" + y + '}';
+    public String toString(){
+        return "{\"x\":" + x + ",\"y\":" + y + "}";
     }
     
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Point point = (Point) obj;
+        return x == point.x && y == point.y;
+    }
     
-    
-    
+    @Override
+    public int hashCode() {
+        return 31 * x + y;
+    }
 }
